@@ -1,0 +1,6 @@
+#!/usr/local/bin/python3.7
+
+import subprocess
+
+command=subprocess.run(["ls","-lrt"],stdout=subprocess.PIPE)
+print(command.stdout.decode())
