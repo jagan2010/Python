@@ -1,0 +1,11 @@
+set encryption on;
+report schema;
+BACKUP FORCE DEVICE TYPE SBT AS COMPRESSED BACKUPSET INCREMENTAL LEVEL 0 format 'df_%d_%I_%U_%T_%t' SECTION SIZE 1G DATABASE PLUS ARCHIVELOG not backed up FORMAT 'arc_%d_%I_%U_%T_%t' ;
+# Force log check
+SQL 'ALTER SYSTEM ARCHIVE LOG CURRENT';
+backup device type sbt as compressed backupset current controlfile format 'cf_%d_%I_%U_%T_%t' spfile format 'spf_%d_%I_%U_%T_%t' ;
+# Validate backups
+RESTORE DATABASE VALIDATE;
+RESTORE CONTROLFILE VALIDATE;
+EXIT
+
