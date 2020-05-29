@@ -12,10 +12,12 @@ with open('/etc/oratab','r') as O:
     for line in O.readlines():
         if (line.find('dbhome') != -1):
             O_HOME=line.strip('\n').split(':')[1]
-            O_BASE="/u01/app/oracle"
+            f=open(f"{O_HOME}/install/orabasetab",'r')
+            O_BASE=f.read().split(':')[1]
         elif (line.find('grid') != -1):
             G_HOME=line.strip('\n').split(':')[1]
-            G_BASE="/u01/app/grid"
+            h=open(f"{G_HOME}/install/orabasetab",'r')
+            G_BASE=h.read().split(':')[1]
 
 command1=f"{G_HOME}/bin/crsctl stat res -w \"TYPE = ora.database.type\" -p |grep -E \"DB_UNIQUE_NAME|USR_ORA_DB_NAME|GEN_USR_ORA_INST_NAME@SERVERNAME\(`hostname`\)\""
 pcommand1=subprocess.run([f"{command1}"],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,shell=True)
@@ -35,6 +37,13 @@ print(dash)
 print(f" DB_UNIQUE_NAME={DB_UNIQUE_NAME}\n INSTANCE_NAME={INSTANCE_NAME}\n DB_NAME={DB_NAME}")
 print(dash)
 
+command2=f"{G_HOME}/bin/crsctl stat res -w \"TYPE = ora.asm.type\" -p |grep -E \"GEN_USR_ORA_INST_NAME@SERVERNAME\(`hostname`\)\""
+pcommand2=subprocess.run([f"{command2}"],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,shell=True)
+out2=pcommand2.stdout.strip().split('\n')
+for z in out2:
+    if z.startswith('GEN_USR'):
+        INSTANCE_ASM=z.split('=')[1]
+
 print("===Important Filesystem usage before space clearance==")
 p1=subprocess.run(["df","-h"],stdout=subprocess.PIPE,text=True,shell=True)
 for i in p1.stdout.split('\n')[1:]:
@@ -47,10 +56,22 @@ for i in p1.stdout.split('\n')[1:]:
 # time is in epoch and removing file older than 7 days
 
 curr = time.time() - (7 * 84500)
+
+#==Removing Oracle Home trace files==
 a = os.walk(f"{O_BASE}/diag/rdbms/{DB_UNIQUE_NAME}/{INSTANCE_NAME}/trace")
 for i,j,k in a:
     for m in k:
-        n=os.path.join(f"{O_BASE}/diag/rdbms/{DB_UNIQUE_NAME}/{INSTANCE_NAME}/trace",m)
+        n=os.path.join(f"{i}",m)
+        if os.path.getmtime(n) < curr:
+            os.remove(n)
+            print("File: ",n,"removed")
+
+#==Removing Grid Home trace files==
+
+b = os.walk(f"{G_BASE}/diag/asm/+asm/{INSTANCE_ASM}/trace")
+for i,j,k in b:
+    for m in k:
+        n=os.path.join(f"{i}",m)
         if os.path.getmtime(n) < curr:
             os.remove(n)
             print("File: ",n,"removed")
