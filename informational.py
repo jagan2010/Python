@@ -2,16 +2,18 @@
 
 import subprocess
 import sys
-
-with open('/etc/oratab','r') as O:
-    for line in O.readlines():
-        if (line.find('dbhome') != -1):
-            O_HOME=line.strip('\n').split(':')[1]
-            O_BASE="/u01/app/oracle"
-        elif (line.find('grid') != -1):
-            G_HOME=line.strip('\n').split(':')[1]
-            G_BASE="/u01/app/grid"
-
+try:
+    with open('/etc/oratab','r') as O:
+        for line in O.readlines():
+            if (line.find('dbhome') != -1):
+                O_HOME=line.strip('\n').split(':')[1]
+                O_BASE="/u01/app/oracle"
+            elif (line.find('grid') != -1):
+                G_HOME=line.strip('\n').split(':')[1]
+                G_BASE="/u01/app/grid"
+except FileNotFoundError as err:
+    print("This is not a Db server, Since there is no oratab file.....Exiting")
+    sys.exit(1)
 command1=f"{G_HOME}/bin/crsctl stat res -w \"TYPE = ora.database.type\" -p |grep -E \"DB_UNIQUE_NAME|USR_ORA_DB_NAME|GEN_USR_ORA_INST_NAME@SERVERNAME\(`hostname`\)\""
 pcommand1=subprocess.run([f"{command1}"],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,shell=True)
 out=pcommand1.stdout.strip().split('\n')
