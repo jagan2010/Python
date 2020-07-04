@@ -6,11 +6,11 @@ import time
 
 parser=argparse.ArgumentParser()
 parser.add_argument('ip_address', help="Enter the ip address and hostname")
-parser.add_argument('--p', help="Enter the port number")
+parser.add_argument('-p','--p', help="Enter the port number")
 args=parser.parse_args()
 
 try:
-    reply=requests.head(f"http://{args.ip_address}:{args.p}/cars")
+    reply=requests.head(f"http://{args.ip_address}:{args.p}/cars",timeout=12)
     if reply.status_code == requests.codes.OK:
         print("Webserver is responding...")
     time.sleep(5)
