@@ -8,3 +8,6 @@ class classy:
     def sum(self):
         classy.counter+=1
         return self.a + self.b
+     
+    def result(self):
+        self.sum()
