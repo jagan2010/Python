@@ -1,0 +1,120 @@
+#!/usr/local/bin/python3.7
+# RestAPI Managed Vintage Cars Database
+
+import sys
+import json
+import requests
+
+# Check_server
+# Print Menu
+# 1. List Cars
+# 2. Add New Car
+# 3. Delete Car
+# 4. Update car
+# 0. Exit
+
+def check_server():
+    try:
+        reply=requests.get('http://140.238.240.20:3000/cars',timeout=12)
+        if reply.status_code == requests.codes.OK:
+            return True
+        else:
+            return False
+    except requests.RequestException:
+        return False
+
+def list_cars():
+    key_item=["id","brand","model","production_year","convertible"]
+    key_space=[10,20,20,25,10]
+    reply=requests.get('http://140.238.240.20:3000/cars',timeout=12)
+    li=reply.json()
+    for (n,w) in zip(key_item,key_space):
+        print(n.ljust(w),end="|")
+    print()
+    draw="="
+    print(90*draw)
+    for i in li:
+        for (j,k) in zip(key_item,key_space):
+            print(str(i[j]).ljust(k),end="|")
+        print()
+
+def input_car_data():
+    car={}
+    car["id"]= int(input(f'Car id ?: '))
+    car["brand"]= input(f'brand ?: ')
+    car["model"]= input(f'model ?: ')
+    car["production_year"] = int(input(f'production_year ?: '))
+    car["convertible"]=bool(input(f'convertible ?: '))
+    return car
+
+def update_input(uid):
+    car={}
+    car["id"]= uid
+    car["brand"]= input(f'brand ?: ')
+    car["model"]= input(f'model ?: ')
+    car["production_year"] = int(input(f'production_year ?: '))
+    car["convertible"]=bool(input(f'convertible ?: '))
+    return car
+
+def add_cars():
+    new_car=input_car_data()
+    h_type={"Content-Type":"application/json"}
+    reply=requests.post(f"http://140.238.240.20:3000/cars",headers=h_type,data=json.dumps(new_car))
+    if reply.status_code == requests.codes.CREATED:
+        print("\n**NEWCAR ADDED TO DATABASE**\n")
+    else:
+        print("\nCAR ADDITION FAILED\n")
+
+def update_cars(uid):
+    upd_car=update_input(uid)
+    h_type={"Content-Type":"application/json"}
+    reply=requests.put(f'http://140.238.240.20:3000/cars/{upd_car["id"]}',headers=h_type,data=json.dumps(upd_car))
+    if reply.status_code == requests.codes.OK:
+        print("\n**CAR UPDATED**\n")
+        print("List of cars after update")
+        list_cars()
+    else:
+        print("\nCAR UPDATE FAILED\n")    
+
+def del_cars():
+    list_cars()
+    idd=int(input("Enter the ID to delete: "))
+    reply=requests.delete(f"http://140.238.240.20:3000/cars/{idd}")
+    if reply.status_code==requests.codes.OK:
+        print("\n**CAR DELETED FROM DATABASE**\n")
+        print("List of Cars after deletion")
+        list_cars()
+    else:
+        print("\nCAR DELETION FAILED\n")
+
+def print_menu():
+    line="--"
+    draw="+"+(21*line)+"+"
+    print(draw)
+    print("|","".rjust(9),"Vintage Cars Database","".rjust(9),end="|")
+    print()
+    print(draw)
+    print("MENU \n===== \n1. List Cars \n2. Add New Car \n3. Delete Car \n4. Update car \n0. Exit")
+    
+
+while True:
+    if not check_server():
+        print("Server not responding..Exiting")
+        sys.exit(1)
+    print_menu()
+    choice = int(input("Enter you choice (0..4): "))
+    if (choice == 1):
+        list_cars()
+    elif (choice == 2):
+        add_cars()
+    elif (choice == 3):
+        del_cars()
+    elif (choice == 4):
+        print("Here are the list of cars in Database")
+        list_cars()
+        uid=int(input("Car ID to Update: "))
+        update_cars(uid)
+    else:
+        print("Bye..Bye")
+        sys.exit(1)
+
