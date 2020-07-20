@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-# Script:- Python scripting for MySQL Installation
+# Author      :- jagadish.uddandam@oracle.com
+# Description :- MySQL Community server Installations - 5.6 , 5.7 , 8.0
+# Requirements:- Need Python version 3.6 or above to run this script
 
 import requests
 import subprocess
@@ -53,26 +55,26 @@ choice=int(input("Choose a MySQL Database version: "))
 if choice == 1:
     dis_cmd=f"/bin/yum-config-manager --disable mysql80-community,mysql57-community"
     enb_cmd=f"/bin/yum-config-manager --enable mysql56-community"
-    subprocess.run([f"{dis_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    subprocess.run([f"{enb_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     download_repo()
     install_repo()
+    subprocess.run([f"{dis_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    subprocess.run([f"{enb_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     install_mysqldb()
 elif choice == 2:
     dis_cmd=f"/bin/yum-config-manager --disable mysql80-community,mysql56-community"
     enb_cmd=f"/bin/yum-config-manager --enable mysql57-community"
-    subprocess.run([f"{dis_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    subprocess.run([f"{enb_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     download_repo()
     install_repo()
+    subprocess.run([f"{dis_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    subprocess.run([f"{enb_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     install_mysqldb()
 elif choice == 3:
     dis_cmd=f"/bin/yum-config-manager --disable mysql57-community,mysql56-community"
     end_cmd=f"/bin/yum-config-manager --enable mysql80-community"
-    subprocess.run([f"{dis_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    subprocess.run([f"{enb_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     download_repo()
     install_repo()
+    subprocess.run([f"{dis_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    subprocess.run([f"{enb_cmd}"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     install_mysqldb()
 else:
     print("Invalid choice")
