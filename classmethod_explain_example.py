@@ -6,5 +6,5 @@ class Oracledb:
         print("This is",self.instance_type,"Database and has",self.num_instances,"instances")
     @classmethod
     def singleinstance(cls):
-        instance_type="standalone"
-        num_instances=1
+        j=cls('Standalone',1)
+        return j
